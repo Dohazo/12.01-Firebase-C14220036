@@ -60,10 +60,30 @@ class MainActivity : AppCompatActivity() {
             tambahData(db,_etProvinsi.text.toString(),_etIbukota.text.toString())
 
         }
+        _lvData.setOnItemLongClickListener  {
+            parent,view,position, id ->
+            val namaPro = data[position].get("Pro")
+            if(namaPro != null){
+                db.collection("tbProvinsi")
+                    .document(namaPro)
+                    .delete()
+                    .addOnSuccessListener {
+                        Log.d("firebase", "Data Berhasil Dihapus")
+                        readData(db)
+                    }
+                    .addOnFailureListener {
+                        Log.w("firebase", it.message.toString())
+                    }
+
+            }
+            true
+        }
     }
     fun tambahData(db: FirebaseFirestore, Provinsi : String, Ibukota : String){
         val dataBaru = daftarProvinsi(Provinsi,Ibukota)
-        db.collection("tbProvinsi").add(dataBaru)
+        db.collection("tbProvinsi")
+            .document(dataBaru.provinsi)
+            .set(dataBaru)
             .addOnSuccessListener {
                 _etProvinsi.setText("")
                 _etIbukota.setText("")
